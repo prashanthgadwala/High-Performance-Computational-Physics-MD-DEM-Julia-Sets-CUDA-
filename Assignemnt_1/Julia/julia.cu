@@ -73,21 +73,6 @@ void saveImage(const char* filename, const std::vector<unsigned char>& image) {
     }
 }
 
-// Function to generate a gradient test image
-void saveGradientImage() {
-    std::vector<unsigned char> img(WIDTH * HEIGHT * 4);
-    for (int y = 0; y < HEIGHT; ++y) {
-        for (int x = 0; x < WIDTH; ++x) {
-            int idx = 4 * (y * WIDTH + x);
-            img[idx]     = (unsigned char)((float)x / WIDTH * 255);   // Red
-            img[idx + 1] = (unsigned char)((float)y / HEIGHT * 255);  // Green
-            img[idx + 2] = 0;                                         // Blue
-            img[idx + 3] = 255;                                       // Alpha
-        }
-    }
-    saveImage("gradient.png", img);
-}
-
 int main(int argc, char** argv) {
     if (argc < 4) {
         std::cerr << "Usage: " << argv[0] << " <c_real> <c_imag> <output_filename>\n";
@@ -100,28 +85,15 @@ int main(int argc, char** argv) {
     
     std::cout << "Generating Julia set for c = " << cr << " + " << ci << "i\n";
     
-    // Create a test gradient image
-    saveGradientImage();
-    std::cout << "Created test gradient image: gradient.png\n";
-    
     // Allocate host memory for the image
     std::vector<unsigned char> h_img(WIDTH * HEIGHT * 4, 0);
     
     // Allocate device memory
     unsigned char* d_img = nullptr;
-    cudaError_t err = cudaMalloc(&d_img, WIDTH * HEIGHT * 4);
-    if (err != cudaSuccess) {
-        std::cerr << "CUDA memory allocation failed: " << cudaGetErrorString(err) << std::endl;
-        return 1;
-    }
+    cudaMalloc(&d_img, WIDTH * HEIGHT * 4);
     
     // Initialize device memory to zero
-    err = cudaMemset(d_img, 0, WIDTH * HEIGHT * 4);
-    if (err != cudaSuccess) {
-        std::cerr << "CUDA memset failed: " << cudaGetErrorString(err) << std::endl;
-        cudaFree(d_img);
-        return 1;
-    }
+    cudaMemset(d_img, 0, WIDTH * HEIGHT * 4);
     
     // Set up grid and block dimensions
     dim3 blockDim(16, 16);
@@ -135,28 +107,13 @@ int main(int argc, char** argv) {
     juliaKernel<<<gridDim, blockDim>>>(d_img, cr, ci);
     
     // Check for kernel launch errors
-    err = cudaGetLastError();
-    if (err != cudaSuccess) {
-        std::cerr << "Kernel launch failed: " << cudaGetErrorString(err) << std::endl;
-        cudaFree(d_img);
-        return 1;
-    }
-    
+    //cudaGetLastError();
+
     // Wait for kernel to finish
-    err = cudaDeviceSynchronize();
-    if (err != cudaSuccess) {
-        std::cerr << "CUDA synchronize failed: " << cudaGetErrorString(err) << std::endl;
-        cudaFree(d_img);
-        return 1;
-    }
+    cudaDeviceSynchronize();
     
     // Copy result back to host
-    err = cudaMemcpy(h_img.data(), d_img, WIDTH * HEIGHT * 4, cudaMemcpyDeviceToHost);
-    if (err != cudaSuccess) {
-        std::cerr << "CUDA memcpy failed: " << cudaGetErrorString(err) << std::endl;
-        cudaFree(d_img);
-        return 1;
-    }
+    cudaMemcpy(h_img.data(), d_img, WIDTH * HEIGHT * 4, cudaMemcpyDeviceToHost);
     
     // Free device memory
     cudaFree(d_img);
