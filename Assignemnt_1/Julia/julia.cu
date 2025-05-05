@@ -1,95 +1,168 @@
 #include <iostream>
+#include <vector>
 #include <cuda_runtime.h>
-#include <cmath>
 #include <string>
+#include "lodepng.h"
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
-
-// Image dimensions and max iterations
+// Image dimensions
 const int WIDTH = 1024;
 const int HEIGHT = 1024;
-const int MAX_ITER = 128;
-const float THRESHOLD = 10.0f;
+const int MAX_ITER = 300;
+
+// Coordinate bounds for the Julia set
 const float X_MIN = -2.0f;
 const float X_MAX = 2.0f;
 const float Y_MIN = -2.0f;
 const float Y_MAX = 2.0f;
 
-__constant__ float2 c;  // Complex constant, stored in constant memory for GPU
-
-// Julia iteration kernel
-__device__ int juliaIterations(float2 z, int max_iter, float threshold) {
-    int iter = 0;
-    while (iter < max_iter && (z.x * z.x + z.y * z.y) < threshold * threshold) {
-        float x = z.x * z.x - z.y * z.y + c.x;
-        float y = 2.0f * z.x * z.y + c.y;
-        z.x = x;
-        z.y = y;
-        ++iter;
-    }
-    return iter;
-}
-
-// Kernel to calculate the Julia set for each pixel
-__global__ void juliaKernel(unsigned char* img, int width, int height, int max_iter, float threshold) {
+// CUDA kernel for Julia set generation
+__global__ void juliaKernel(unsigned char* img, float cr, float ci) {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
-    if (x >= width || y >= height) return;
-
-    float real = X_MIN + x * (X_MAX - X_MIN) / width;
-    float imag = Y_MIN + y * (Y_MAX - Y_MIN) / height;
-    float2 z = {real, imag};
-
-    int iter = juliaIterations(z, max_iter, threshold);
-    int idx = (y * width + x) * 3;
-    unsigned char val = static_cast<unsigned char>(255.0f * iter / max_iter);
-    img[idx + 0] = val;
-    img[idx + 1] = val;
-    img[idx + 2] = val;
+    
+    if (x >= WIDTH || y >= HEIGHT)
+        return;
+    
+    // Map pixel position to complex plane
+    float zx = X_MIN + (X_MAX - X_MIN) * x / (WIDTH - 1);
+    float zy = Y_MIN + (Y_MAX - Y_MIN) * y / (HEIGHT - 1);
+    
+    int iter = 0;
+    float zx2 = zx * zx;
+    float zy2 = zy * zy;
+    
+    // Standard Julia set iteration: z = z² + c
+    while (iter < MAX_ITER && zx2 + zy2 < 4.0f) {
+        float xtemp = zx2 - zy2 + cr;
+        zy = 2 * zx * zy + ci;
+        zx = xtemp;
+        zx2 = zx * zx;
+        zy2 = zy * zy;
+        iter++;
+    }
+    
+    // Calculate the color based on iteration count
+    int idx = 4 * (y * WIDTH + x);
+    
+    if (iter == MAX_ITER) {
+        // Points in the set are black
+        img[idx]     = 0;     // R
+        img[idx + 1] = 0;     // G
+        img[idx + 2] = 0;     // B
+        img[idx + 3] =
+        img[idx + 3] = 255;   // Alpha
+    } else {
+        // Map iteration count to a smooth color
+        float t = (float)iter / MAX_ITER;
+        
+        // RGB coloring (simple gradient)
+        img[idx]     = (unsigned char)(255 * t);           // R
+        img[idx + 1] = (unsigned char)(255 * (1.0f - t));  // G
+        img[idx + 2] = (unsigned char)(128);               // B
+        img[idx + 3] = 255;                                // Alpha
+    }
 }
 
-// Save the image as PNG
-void saveImage(const char* filename, unsigned char* data, int width, int height) {
-    stbi_write_png(filename, width, height, 3, data, width * 3);
+// Helper function to save an image using LodePNG
+void saveImage(const char* filename, const std::vector<unsigned char>& image) {
+    unsigned error = lodepng::encode(filename, image, WIDTH, HEIGHT);
+    if (error) {
+        std::cerr << "PNG encoding error " << error << ": " << lodepng_error_text(error) << std::endl;
+    } else {
+        std::cout << "Image saved successfully to " << filename << std::endl;
+    }
 }
 
-// Main function to initialize CUDA, launch the kernel, and save the image
+// Function to generate a gradient test image
+void saveGradientImage() {
+    std::vector<unsigned char> img(WIDTH * HEIGHT * 4);
+    for (int y = 0; y < HEIGHT; ++y) {
+        for (int x = 0; x < WIDTH; ++x) {
+            int idx = 4 * (y * WIDTH + x);
+            img[idx]     = (unsigned char)((float)x / WIDTH * 255);   // Red
+            img[idx + 1] = (unsigned char)((float)y / HEIGHT * 255);  // Green
+            img[idx + 2] = 0;                                         // Blue
+            img[idx + 3] = 255;                                       // Alpha
+        }
+    }
+    saveImage("gradient.png", img);
+}
+
 int main(int argc, char** argv) {
     if (argc < 4) {
-        std::cerr << "Usage: ./julia <c_real> <c_imag> <output_filename>\n";
+        std::cerr << "Usage: " << argv[0] << " <c_real> <c_imag> <output_filename>\n";
         return 1;
     }
-
-    // Parse command line arguments
-    float c_real = std::stof(argv[1]);
-    float c_imag = std::stof(argv[2]);
-    std::string outname = argv[3];
-
-    // Copy complex constant to device constant memory
-    float2 c_host = {c_real, c_imag};
-    cudaMemcpyToSymbol(c, &c_host, sizeof(float2));
-
-    // Allocate memory for the image on the host and device
-    const int imgSize = WIDTH * HEIGHT * 3;
-    unsigned char* h_img = new unsigned char[imgSize];
-    unsigned char* d_img;
-    cudaMalloc(&d_img, imgSize);
-
-    // Launch kernel to compute Julia set
-    dim3 blockSize(16, 16);
-    dim3 gridSize((WIDTH + 15) / 16, (HEIGHT + 15) / 16);
-    juliaKernel<<<gridSize, blockSize>>>(d_img, WIDTH, HEIGHT, MAX_ITER, THRESHOLD);
-    cudaDeviceSynchronize();
-
-    // Copy result back to host and save image
-    cudaMemcpy(h_img, d_img, imgSize, cudaMemcpyDeviceToHost);
-    saveImage(outname.c_str(), h_img, WIDTH, HEIGHT);
-
-    // Clean up
-    std::cout << "Saved: " << outname << std::endl;
+    
+    float cr = std::stof(argv[1]);  // Real part of c
+    float ci = std::stof(argv[2]);  // Imaginary part of c
+    std::string outfile = argv[3];  // Output filename
+    
+    std::cout << "Generating Julia set for c = " << cr << " + " << ci << "i\n";
+    
+    // Create a test gradient image
+    saveGradientImage();
+    std::cout << "Created test gradient image: gradient.png\n";
+    
+    // Allocate host memory for the image
+    std::vector<unsigned char> h_img(WIDTH * HEIGHT * 4, 0);
+    
+    // Allocate device memory
+    unsigned char* d_img = nullptr;
+    cudaError_t err = cudaMalloc(&d_img, WIDTH * HEIGHT * 4);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA memory allocation failed: " << cudaGetErrorString(err) << std::endl;
+        return 1;
+    }
+    
+    // Initialize device memory to zero
+    err = cudaMemset(d_img, 0, WIDTH * HEIGHT * 4);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA memset failed: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_img);
+        return 1;
+    }
+    
+    // Set up grid and block dimensions
+    dim3 blockDim(16, 16);
+    dim3 gridDim((WIDTH + blockDim.x - 1) / blockDim.x, 
+                 (HEIGHT + blockDim.y - 1) / blockDim.y);
+    
+    std::cout << "Launching kernel with grid: " << gridDim.x << "x" << gridDim.y 
+              << ", block: " << blockDim.x << "x" << blockDim.y << std::endl;
+    
+    // Launch the kernel
+    juliaKernel<<<gridDim, blockDim>>>(d_img, cr, ci);
+    
+    // Check for kernel launch errors
+    err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << "Kernel launch failed: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_img);
+        return 1;
+    }
+    
+    // Wait for kernel to finish
+    err = cudaDeviceSynchronize();
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA synchronize failed: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_img);
+        return 1;
+    }
+    
+    // Copy result back to host
+    err = cudaMemcpy(h_img.data(), d_img, WIDTH * HEIGHT * 4, cudaMemcpyDeviceToHost);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA memcpy failed: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_img);
+        return 1;
+    }
+    
+    // Free device memory
     cudaFree(d_img);
-    delete[] h_img;
-
+    
+    // Save the image
+    saveImage(outfile.c_str(), h_img);
+    
     return 0;
 }
