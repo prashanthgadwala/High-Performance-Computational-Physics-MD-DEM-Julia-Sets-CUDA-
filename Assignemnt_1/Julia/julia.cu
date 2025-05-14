@@ -49,7 +49,6 @@ __global__ void juliaKernel(unsigned char* img, float cr, float ci) {
         img[idx]     = 0;     // R
         img[idx + 1] = 0;     // G
         img[idx + 2] = 0;     // B
-        img[idx + 3] =
         img[idx + 3] = 255;   // Alpha
     } else {
         // Map iteration count to a smooth color
