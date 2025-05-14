@@ -7,19 +7,19 @@ echo "========= Julia Set Generator ========="
 mkdir -p output
 
 # === CONFIG ===
-CXX=g++
-NVCC=nvcc
+# === CONFIG ===
+CXX=/usr/bin/g++
+NVCC="nvcc -ccbin /usr/bin/g++"
 OUTPUT_NAME=julia_simple
 CUDA_PATH="/opt/nvidia/hpc_sdk/Linux_x86_64/2025/cuda"
 CUDA_LIB="$CUDA_PATH/lib64"
 CUDA_INCLUDE="$CUDA_PATH/include"
 
-# For RTX 4050, the compute capability is 8.9 (Ada Lovelace architecture)
-NVCC_FLAGS="--std=c++17 -arch=sm_89 -Xcompiler=-std=c++20,-fPIC -Wno-deprecated-gpu-targets -I$CUDA_INCLUDE"
+NVCC_FLAGS="--std=c++17 -arch=sm_89 -Xcompiler=-fPIC -I$CUDA_INCLUDE"
 
 # === BUILD ===
 echo "[1/3] Compiling lodepng.cpp..."
-$CXX -std=c++20 -O2 -c lodepng.cpp -o lodepng.o
+$CXX -std=c++17 -O2 -c lodepng.cpp -o lodepng.o
 
 echo "[2/3] Compiling julia.cu..."
 $NVCC $NVCC_FLAGS -c julia.cu -o julia.o
