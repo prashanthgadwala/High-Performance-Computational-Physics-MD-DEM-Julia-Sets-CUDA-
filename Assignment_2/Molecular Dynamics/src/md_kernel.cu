@@ -4,6 +4,8 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
+void check_cuda_error(const char* msg);
+
 // Lennard-Jones force calculation kernel
 __global__ void compute_forces_kernel(Particle* particles, int N, float sigma, float epsilon) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -35,27 +37,49 @@ void launch_compute_forces(Particle* d_particles, int N, float sigma, float epsi
     int block = 128;
     int grid = (N + block - 1) / block;
     compute_forces_kernel<<<grid, block>>>(d_particles, N, sigma, epsilon);
+    check_cuda_error("compute_forces_kernel");
 }
 
 // Velocity Verlet integration kernel
-__global__ void integrate_kernel(Particle* particles, int N, float dt) {
+__global__ void integrate_first_half_kernel(Particle* particles, int N, float dt) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= N) return;
 
+    // Velocity half-step update
     particles[i].vel.x += 0.5f * particles[i].acc.x * dt;
     particles[i].vel.y += 0.5f * particles[i].acc.y * dt;
     particles[i].vel.z += 0.5f * particles[i].acc.z * dt;
 
+    // Position full-step update
     particles[i].pos.x += particles[i].vel.x * dt;
     particles[i].pos.y += particles[i].vel.y * dt;
     particles[i].pos.z += particles[i].vel.z * dt;
 }
 
-void launch_integrate(Particle* d_particles, int N, float dt) {
+void launch_integrate_first_half(Particle* d_particles, int N, float dt) {
     int block = 128;
     int grid = (N + block - 1) / block;
-    integrate_kernel<<<grid, block>>>(d_particles, N, dt);
+    integrate_first_half_kernel<<<grid, block>>>(d_particles, N, dt);
+    check_cuda_error("integrate_first_half_kernel");
 }
+
+__global__ void integrate_second_half_kernel(Particle* particles, int N, float dt) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= N) return;
+
+    // Final velocity half-step update using new acceleration
+    particles[i].vel.x += 0.5f * particles[i].acc.x * dt;
+    particles[i].vel.y += 0.5f * particles[i].acc.y * dt;
+    particles[i].vel.z += 0.5f * particles[i].acc.z * dt;
+}
+
+void launch_integrate_second_half(Particle* d_particles, int N, float dt) {
+    int block = 128;
+    int grid = (N + block - 1) / block;
+    integrate_second_half_kernel<<<grid, block>>>(d_particles, N, dt);
+    check_cuda_error("integrate_second_half_kernel");
+}
+
 
 void print_particles(const std::vector<Particle>& particles, int max_print) {
     for (int i = 0; i < std::min((int)particles.size(), max_print); ++i) {

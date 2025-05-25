@@ -32,13 +32,21 @@ int main(int argc, char** argv) {
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
+    launch_compute_forces(d_particles, N, sigma, epsilon);
+
     for (int step = 0; step < nsteps; ++step) {
+        launch_integrate_first_half(d_particles, N, dt);
         launch_compute_forces(d_particles, N, sigma, epsilon);
-        launch_integrate(d_particles, N, dt);
+        launch_integrate_second_half(d_particles, N, dt);
 
         // Output VTK every 100 steps
         if (step % 100 == 0) {
             cudaMemcpy(particles.data(), d_particles, N * sizeof(Particle), cudaMemcpyDeviceToHost);
+            for (int i = 0; i < N; ++i) {
+                std::cout << "Step " << step << " Particle " << i
+                          << ": pos=(" << particles[i].pos.x << "," << particles[i].pos.y << "," << particles[i].pos.z << ")"
+                          << " vel=(" << particles[i].vel.x << "," << particles[i].vel.y << "," << particles[i].vel.z << ")\n";
+            }
             std::string vtkfile = outdir + "/step_" + std::to_string(step) + ".vtk";
             write_vtk(vtkfile, particles, step);
         }
