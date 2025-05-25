@@ -27,25 +27,22 @@ int main(int argc, char** argv) {
     cudaMalloc(&d_particles, N * sizeof(Particle));
     cudaMemcpy(d_particles, particles.data(), N * sizeof(Particle), cudaMemcpyHostToDevice);
 
+    const char* outdir_env = std::getenv("OUTPUT_DIR");
+    std::string outdir = outdir_env ? outdir_env : "output";
+
     auto t_start = std::chrono::high_resolution_clock::now();
 
     for (int step = 0; step < nsteps; ++step) {
         launch_compute_forces(d_particles, N, sigma, epsilon);
         launch_integrate(d_particles, N, dt);
-        const char* outdir_env = std::getenv("OUTPUT_DIR");
-        std::string outdir = outdir_env ? outdir_env : "output";
 
-        for (int step = 0; step < nsteps; ++step) {
-            launch_compute_forces(d_particles, N, sigma, epsilon);
-            launch_integrate(d_particles, N, dt);
-
-            // Output VTK every 100 steps
-            if (step % 100 == 0) {
-                cudaMemcpy(particles.data(), d_particles, N * sizeof(Particle), cudaMemcpyDeviceToHost);
-                std::string vtkfile = outdir + "/step_" + std::to_string(step) + ".vtk";
-                write_vtk(vtkfile, particles, step);
-            }
+        // Output VTK every 100 steps
+        if (step % 100 == 0) {
+            cudaMemcpy(particles.data(), d_particles, N * sizeof(Particle), cudaMemcpyDeviceToHost);
+            std::string vtkfile = outdir + "/step_" + std::to_string(step) + ".vtk";
+            write_vtk(vtkfile, particles, step);
         }
+        
     }
 
     auto t_end = std::chrono::high_resolution_clock::now();
