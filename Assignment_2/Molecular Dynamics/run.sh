@@ -1,22 +1,45 @@
 #!/bin/bash
+#SBATCH --partition=a100
+#SBATCH --gres=gpu:a100:1
+#SBATCH --time=00:10:00
+#SBATCH --job-name=md_sim
+#SBATCH --output=md_sim.out
+
 set -e
 
 echo "========= Molecular Dynamics Simulation ========="
 
-# Build the project
 make
 
-# Create output directory if it doesn't exist
 mkdir -p output
 
-# Simulation parameters
-INPUT_FILE="src/input/particles_test1.txt"
+INPUT_FILES=(
+    "src/input/stable-particle.txt"
+    "src/input/attact-particle.txt"
+    "src/input/repel-particle.txt"
+    "src/input/block-particles.txt"
+    "src/input/grid-particles.txt"
+    "src/input/particles_test1.txt"
+)
+
 DT=0.001
 NSTEPS=1000
 SIGMA=1.0
 EPSILON=1.0
 
-# Run the simulation
-./build/md_sim $INPUT_FILE $DT $NSTEPS $SIGMA $EPSILON
+echo "Test Case | #Particles | Avg. Time/Step (s)"
+echo "--------------------------------------------"
+
+for INPUT_FILE in "${INPUT_FILES[@]}"; do
+    if [[ -f "$INPUT_FILE" ]]; then
+        NUM_PARTICLES=$(grep -v '^#' "$INPUT_FILE" | wc -l)
+        OUTPUT=$(./build/md_sim "$INPUT_FILE" $DT $NSTEPS $SIGMA $EPSILON | grep "Average time per step")
+        AVG_TIME=$(echo "$OUTPUT" | awk '{print $5}')
+        TEST_NAME=$(basename "$INPUT_FILE")
+        echo "$TEST_NAME | $NUM_PARTICLES | $AVG_TIME"
+    else
+        echo "$INPUT_FILE not found, skipping."
+    fi
+done
 
 echo "Done! Check the output directory for results."

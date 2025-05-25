@@ -1,0 +1,7 @@
+========= Molecular Dynamics Simulation =========
+mkdir -p build
+Total simulation time: 0.123696 s
+Average time per step: 0.000123696 s
+Particle 0: pos=(1341.67,17.6246,0) vel=(1502.11,19.7337,0) mass=1
+Particle 1: pos=(-1340.67,-17.5246,0) vel=(-1502.11,-19.6337,0) mass=1
+Done! Check the output directory for results.
