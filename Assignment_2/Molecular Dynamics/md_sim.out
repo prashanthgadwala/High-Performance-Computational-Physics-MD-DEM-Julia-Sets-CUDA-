@@ -1,12 +1,11 @@
 ========= Molecular Dynamics Simulation =========
 mkdir -p build
-nvcc -O3 -std=c++17 -o build/md_sim src/main.cu src/md_kernel.cu src/io.cpp src/vtk_writer.cpp
 Test Case | #Particles | Avg. Time/Step (s)
 --------------------------------------------
-stable-particle | 2 | 3.55831e-05
-attact-particle | 2 | 4.01626e-05
-repel-particle | 2 | 4.73318e-05
-block-particles | 10 | 6.49497e-05
-grid-particles | 9 | 5.61491e-05
-particles_test1 | 2 | 4.93636e-05
+stable-particle | 2 | 0.000135591
+attact-particle | 2 | 3.11624e-05
+repel-particle | 2 | 3.02949e-05
+block-particles | 10 | 3.51397e-05
+grid-particles | 9 | 3.48241e-05
+particles_test1 | 2 | 3.04207e-05
 Done! Check the output directory for results.

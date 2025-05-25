@@ -22,7 +22,7 @@ INPUT_FILES=(
     "src/input/particles_test1.txt"
 )
 
-DT=0.001
+DT=0.0001
 NSTEPS=1000
 SIGMA=1.0
 EPSILON=1.0

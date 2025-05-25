@@ -18,7 +18,7 @@ __global__ void compute_forces_kernel(Particle* particles, int N, float sigma, f
         if (i == j) continue;
         float3 pj = particles[j].pos;
         float3 rij = {pj.x - pi.x, pj.y - pi.y, pj.z - pi.z};
-        float r2 = rij.x*rij.x + rij.y*rij.y + rij.z*rij.z + 1e-12f;
+        float r2 = rij.x*rij.x + rij.y*rij.y + rij.z*rij.z + 1e-8f;
         float r6 = r2 * r2 * r2;
         float r12 = r6 * r6;
         float sig6 = sigma*sigma*sigma*sigma*sigma*sigma;
