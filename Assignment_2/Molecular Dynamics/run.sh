@@ -33,9 +33,10 @@ echo "--------------------------------------------"
 for INPUT_FILE in "${INPUT_FILES[@]}"; do
     if [[ -f "$INPUT_FILE" ]]; then
         NUM_PARTICLES=$(grep -v '^#' "$INPUT_FILE" | wc -l)
-        OUTPUT=$(./build/md_sim "$INPUT_FILE" $DT $NSTEPS $SIGMA $EPSILON | grep "Average time per step")
-        AVG_TIME=$(echo "$OUTPUT" | awk '{print $5}')
-        TEST_NAME=$(basename "$INPUT_FILE")
+        TEST_NAME=$(basename "$INPUT_FILE" .txt)
+        OUTDIR="output/${TEST_NAME}"
+        mkdir -p "$OUTDIR"
+        AVG_TIME=$(OUTPUT_DIR="$OUTDIR" ./build/md_sim "$INPUT_FILE" $DT $NSTEPS $SIGMA $EPSILON | grep "Average time per step" | awk '{print $5}')
         echo "$TEST_NAME | $NUM_PARTICLES | $AVG_TIME"
     else
         echo "$INPUT_FILE not found, skipping."

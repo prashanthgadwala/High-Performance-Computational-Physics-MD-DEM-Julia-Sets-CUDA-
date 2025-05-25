@@ -32,12 +32,19 @@ int main(int argc, char** argv) {
     for (int step = 0; step < nsteps; ++step) {
         launch_compute_forces(d_particles, N, sigma, epsilon);
         launch_integrate(d_particles, N, dt);
+        const char* outdir_env = std::getenv("OUTPUT_DIR");
+        std::string outdir = outdir_env ? outdir_env : "output";
 
-        // Output VTK every 100 steps
-        if (step % 100 == 0) {
-            cudaMemcpy(particles.data(), d_particles, N * sizeof(Particle), cudaMemcpyDeviceToHost);
-            std::string vtkfile = "output/step_" + std::to_string(step) + ".vtk";
-            write_vtk(vtkfile, particles, step);
+        for (int step = 0; step < nsteps; ++step) {
+            launch_compute_forces(d_particles, N, sigma, epsilon);
+            launch_integrate(d_particles, N, dt);
+
+            // Output VTK every 100 steps
+            if (step % 100 == 0) {
+                cudaMemcpy(particles.data(), d_particles, N * sizeof(Particle), cudaMemcpyDeviceToHost);
+                std::string vtkfile = outdir + "/step_" + std::to_string(step) + ".vtk";
+                write_vtk(vtkfile, particles, step);
+            }
         }
     }
 
