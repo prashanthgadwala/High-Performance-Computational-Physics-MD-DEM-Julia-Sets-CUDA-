@@ -26,6 +26,10 @@ DT=0.0001
 NSTEPS=1000
 SIGMA=1.0
 EPSILON=1.0
+BOX_X=10.0
+BOX_Y=10.0
+BOX_Z=10.0
+RCUT=2.5
 
 echo "Test Case | #Particles | Avg. Time/Step (s)"
 echo "--------------------------------------------"
@@ -36,7 +40,7 @@ for INPUT_FILE in "${INPUT_FILES[@]}"; do
         TEST_NAME=$(basename "$INPUT_FILE" .txt)
         OUTDIR="output/${TEST_NAME}"
         mkdir -p "$OUTDIR"
-        AVG_TIME=$(OUTPUT_DIR="$OUTDIR" ./build/md_sim "$INPUT_FILE" $DT $NSTEPS $SIGMA $EPSILON | grep "Average time per step" | awk '{print $5}')
+        AVG_TIME=$(OUTPUT_DIR="$OUTDIR" ./build/md_sim "$INPUT_FILE" $DT $NSTEPS $SIGMA $EPSILON $BOX_X $BOX_Y $BOX_Z $RCUT | grep "Average time per step" | awk '{print $5}')
         echo "$TEST_NAME | $NUM_PARTICLES | $AVG_TIME"
     else
         echo "$INPUT_FILE not found, skipping."

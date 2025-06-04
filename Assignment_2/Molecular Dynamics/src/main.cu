@@ -8,7 +8,7 @@
 #include <string>
 
 int main(int argc, char** argv) {
-    if (argc < 6) {
+    if (argc < 10) {
         std::cerr << "Usage: " << argv[0] << " input.txt dt nsteps sigma epsilon" << std::endl;
         return 1;
     }
@@ -17,6 +17,10 @@ int main(int argc, char** argv) {
     int nsteps = std::stoi(argv[3]);
     float sigma = std::stof(argv[4]);
     float epsilon = std::stof(argv[5]);
+    float box_x = std::stof(argv[6]);
+    float box_y = std::stof(argv[7]);
+    float box_z = std::stof(argv[8]);
+    float rcut  = std::stof(argv[9]);
 
     std::vector<Particle> particles;
     if (!read_particles(input_file, particles)) return 1;
@@ -32,15 +36,14 @@ int main(int argc, char** argv) {
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
-    launch_compute_forces(d_particles, N, sigma, epsilon);
+    launch_compute_forces(d_particles, N, sigma, epsilon, box_x, box_y, box_z, rcut);
 
     for (int step = 0; step < nsteps; ++step) {
-        launch_integrate_first_half(d_particles, N, dt);
-        launch_compute_forces(d_particles, N, sigma, epsilon);
+        launch_integrate_first_half(d_particles, N, dt, box_x, box_y, box_z);
+        launch_compute_forces(d_particles, N, sigma, epsilon, box_x, box_y, box_z, rcut);
         launch_integrate_second_half(d_particles, N, dt);
-
         // Output VTK every 100 steps
-        if (step % 100 == 0) {
+        if (step % 10 == 0) {
             cudaMemcpy(particles.data(), d_particles, N * sizeof(Particle), cudaMemcpyDeviceToHost);
             for (int i = 0; i < N; ++i) {
                 std::cout << "Step " << step << " Particle " << i
