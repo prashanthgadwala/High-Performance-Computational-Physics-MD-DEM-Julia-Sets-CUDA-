@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cuda_runtime.h>
 #include <iostream>
+#include "cell_list.h"
 
 void check_cuda_error(const char* msg);
 
@@ -17,8 +18,7 @@ __global__ void compute_forces_kernel(Particle* particles, int N, float sigma, f
     for (int j = 0; j < N; ++j) {
         if (i == j) continue;
         float3 pj = particles[j].pos;
-        float3 rij = {pj.x - pi.x, pj.y - pi.y, pj.z - pi.z};
-        float r2 = rij.x*rij.x + rij.y*rij.y + rij.z*rij.z;
+        float3 rij = {pj.x - pi.x, pj.y - pi.y, pj.z - pi.z}; 
         rij.x -= box_x * roundf(rij.x / box_x);
         rij.y -= box_y * roundf(rij.y / box_y);
         rij.z -= box_z * roundf(rij.z / box_z);
@@ -42,7 +42,7 @@ __global__ void compute_forces_kernel(Particle* particles, int N, float sigma, f
 void launch_compute_forces(Particle* d_particles, int N, float sigma, float epsilon, float box_x, float box_y, float box_z, float rcut) {
     int block = 128;
     int grid = (N + block - 1) / block;
-    compute_forces_kernel<<<grid, block>>>(d_particles, N, sigma, epsilon, , box_x, box_y, box_z, rcut);
+    compute_forces_kernel<<<grid, block>>>(d_particles, N, sigma, epsilon, box_x, box_y, box_z, rcut);
     check_cuda_error("compute_forces_kernel");
 }
 
@@ -73,7 +73,7 @@ __global__ void integrate_first_half_kernel(Particle* particles, int N, float dt
 void launch_integrate_first_half(Particle* d_particles, int N, float dt, float box_x, float box_y, float box_z) {
     int block = 128;
     int grid = (N + block - 1) / block;
-    integrate_first_half_kernel<<<grid, block>>>(d_particles, N, dt);
+    integrate_first_half_kernel<<<grid, block>>>(d_particles, N, dt, box_x, box_y, box_z);
     check_cuda_error("integrate_first_half_kernel");
 }
 
@@ -109,5 +109,67 @@ void check_cuda_error(const char* msg) {
     if (err != cudaSuccess) {
         std::cerr << "CUDA Error after " << msg << ": " << cudaGetErrorString(err) << std::endl;
         exit(EXIT_FAILURE);
+    }
+}
+
+void build_cell_list(const std::vector<Particle>& particles, CellList& clist, float box_x, float box_y, float box_z) {
+    float cell_size = clist.cell_size;
+    for (int i = 0; i < clist.cells.size(); ++i) clist.cells[i].clear();
+    for (int i = 0; i < particles.size(); ++i) {
+        int ix = int(particles[i].pos.x / cell_size);
+        int iy = int(particles[i].pos.y / cell_size);
+        int iz = int(particles[i].pos.z / cell_size);
+        int idx = clist.cell_index(ix, iy, iz);
+        clist.cells[idx].push_back(i);
+    }
+}
+
+void compute_forces_cell_list(std::vector<Particle>& particles, const CellList& clist,
+                            float sigma, float epsilon, float box_x, float box_y, float box_z, float rcut) {
+    // Zero accelerations
+    for (auto& p : particles) p.acc = {0,0,0};
+    float rcut2 = rcut * rcut;
+    for (int ix = 0; ix < clist.ncell_x; ++ix) {
+        for (int iy = 0; iy < clist.ncell_y; ++iy) {
+            for (int iz = 0; iz < clist.ncell_z; ++iz) {
+                int idx = clist.cell_index(ix, iy, iz);
+                for (int a : clist.cells[idx]) {
+                    Particle& pa = particles[a];
+                    float3 fa = {0,0,0};
+                    // Loop over neighbor cells
+                    for (int dx = -1; dx <= 1; ++dx)
+                    for (int dy = -1; dy <= 1; ++dy)
+                    for (int dz = -1; dz <= 1; ++dz) {
+                        int jx = (ix + dx + clist.ncell_x) % clist.ncell_x;
+                        int jy = (iy + dy + clist.ncell_y) % clist.ncell_y;
+                        int jz = (iz + dz + clist.ncell_z) % clist.ncell_z;
+                        int jidx = clist.cell_index(jx, jy, jz);
+                        for (int b : clist.cells[jidx]) {
+                            if (a == b) continue;
+                            Particle& pb = particles[b];
+                            float3 rij = {pb.pos.x - pa.pos.x, pb.pos.y - pa.pos.y, pb.pos.z - pa.pos.z};
+                            // Minimal image
+                            rij.x -= box_x * roundf(rij.x / box_x);
+                            rij.y -= box_y * roundf(rij.y / box_y);
+                            rij.z -= box_z * roundf(rij.z / box_z);
+                            float r2 = rij.x*rij.x + rij.y*rij.y + rij.z*rij.z;
+                            if (r2 > rcut2) continue;
+                            r2 = fmaxf(r2, 1e-6f);
+                            float r6 = r2 * r2 * r2;
+                            float r12 = r6 * r6;
+                            float sig6 = sigma*sigma*sigma*sigma*sigma*sigma;
+                            float sig12 = sig6 * sig6;
+                            float fmag = 24 * epsilon * (2 * sig12 / r12 - sig6 / r6) / r2;
+                            fa.x += fmag * rij.x;
+                            fa.y += fmag * rij.y;
+                            fa.z += fmag * rij.z;
+                        }
+                    }
+                    pa.acc.x += fa.x / pa.mass;
+                    pa.acc.y += fa.y / pa.mass;
+                    pa.acc.z += fa.z / pa.mass;
+                }
+            }
+        }
     }
 }

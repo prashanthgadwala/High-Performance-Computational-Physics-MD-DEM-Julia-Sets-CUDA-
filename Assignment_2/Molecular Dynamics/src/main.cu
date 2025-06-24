@@ -6,6 +6,7 @@
 #include <cuda_runtime.h>
 #include <chrono>
 #include <string>
+#include "cell_list.h"
 
 int main(int argc, char** argv) {
     if (argc < 10) {
@@ -21,6 +22,12 @@ int main(int argc, char** argv) {
     float box_y = std::stof(argv[7]);
     float box_z = std::stof(argv[8]);
     float rcut  = std::stof(argv[9]);
+    float cell_size = rcut;
+    int ncell_x = int(box_x / cell_size);
+    int ncell_y = int(box_y / cell_size);
+    int ncell_z = int(box_z / cell_size);
+    CellList clist(ncell_x, ncell_y, ncell_z);
+    clist.cell_size = cell_size;
 
     std::vector<Particle> particles;
     if (!read_particles(input_file, particles)) return 1;
@@ -40,6 +47,10 @@ int main(int argc, char** argv) {
 
     for (int step = 0; step < nsteps; ++step) {
         launch_integrate_first_half(d_particles, N, dt, box_x, box_y, box_z);
+        cudaMemcpy(particles.data(), d_particles, N * sizeof(Particle), cudaMemcpyDeviceToHost);
+        build_cell_list(particles, clist, box_x, box_y, box_z);
+        compute_forces_cell_list(particles, clist, sigma, epsilon, box_x, box_y, box_z, rcut);
+        cudaMemcpy(d_particles, particles.data(), N * sizeof(Particle), cudaMemcpyHostToDevice);
         launch_compute_forces(d_particles, N, sigma, epsilon, box_x, box_y, box_z, rcut);
         launch_integrate_second_half(d_particles, N, dt);
         // Output VTK every 100 steps
@@ -55,6 +66,7 @@ int main(int argc, char** argv) {
         }
         
     }
+
 
     auto t_end = std::chrono::high_resolution_clock::now();
     double elapsed = std::chrono::duration<double>(t_end - t_start).count();

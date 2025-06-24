@@ -20,6 +20,9 @@ INPUT_FILES=(
     "src/input/block-particles.txt"
     "src/input/grid-particles.txt"
     "src/input/particles_test1.txt"
+    "src/input/collision_cluster.txt"
+    "src/input/repulsiveshell.txt"
+
 )
 
 DT=0.0001

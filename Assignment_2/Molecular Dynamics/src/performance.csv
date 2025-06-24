@@ -1,0 +1,4 @@
+Method,Cutoff,TimePerStep
+Brute-force,No,0.00045
+Brute-force,Yes,0.00012
+Cell-list,Yes,0.00005

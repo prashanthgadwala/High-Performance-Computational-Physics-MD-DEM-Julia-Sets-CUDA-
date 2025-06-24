@@ -773,3 +773,265 @@ NVIDIA A100-SXM4-40GB, 00000000:D1:00.0, 2229957, 0 %, 0 %, 416 MiB, 565 ms
 NVIDIA A100-SXM4-40GB, 00000000:D1:00.0, 2229971, 0 %, 0 %, 416 MiB, 621 ms
 NVIDIA A100-SXM4-40GB, 00000000:D1:00.0, 2229985, 0 %, 0 %, 416 MiB, 621 ms
 NVIDIA A100-SXM4-40GB, 00000000:D1:00.0, 2229999, 0 %, 0 %, 416 MiB, 634 ms
+### Starting TaskPrologue of job 2719804 on a0702 at Thu Jun  5 21:18:21 CEST 2025
+Running on cores 16-31 with governor ondemand
+Thu Jun  5 21:18:21 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.133.20             Driver Version: 570.133.20     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          On  |   00000000:13:00.0 Off |                    0 |
+| N/A   32C    P0             54W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== JOB_STATISTICS ===
+=== current date     : Thu Jun  5 21:18:27 CEST 2025
+= Job-ID             : 2719804 on alex
+= Job-Name           : md_sim
+= Job-Command        : ./run.sh
+= Initial workdir    : /home/hpc/hesp/hesp148v/HESP_SoSe_2025/Assignment_2/Molecular
+= Queue/Partition    : a100
+= Slurm account      : hesp with QOS=normal
+= Features           : a100_40
+= Requested resources:  for 00:10:00
+= Elapsed runtime    : 00:00:14
+= Total RAM usage    : 0.1 GiB of assigned  GiB (%)
+= Node list          : a0702
+= Subm/Elig/Start/End: 2025-06-05T21:18:10 / 2025-06-05T21:18:10 / 2025-06-05T21:18:13 / 2025-06-05T21:18:27
+======================
+=== Quota infos ======
+    Path              Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/woody          0.0K  1000.0G  1500.0G        N/A       1    5,000K   7,500K        N/A    
+    /home/hpc         4134.6M   104.9G   209.7G        N/A  18,410      500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A100-SXM4-40GB, 00000000:13:00.0, 1011994, 0 %, 0 %, 416 MiB, 1052 ms
+NVIDIA A100-SXM4-40GB, 00000000:13:00.0, 1012009, 0 %, 0 %, 416 MiB, 793 ms
+NVIDIA A100-SXM4-40GB, 00000000:13:00.0, 1012023, 0 %, 0 %, 416 MiB, 776 ms
+NVIDIA A100-SXM4-40GB, 00000000:13:00.0, 1012037, 0 %, 0 %, 416 MiB, 848 ms
+NVIDIA A100-SXM4-40GB, 00000000:13:00.0, 1012052, 3 %, 0 %, 416 MiB, 782 ms
+NVIDIA A100-SXM4-40GB, 00000000:13:00.0, 1012066, 3 %, 0 %, 416 MiB, 957 ms
+### Starting TaskPrologue of job 2775261 on a0602 at Tue Jun 24 21:51:39 CEST 2025
+Running on cores 32-47 with governor ondemand
+Tue Jun 24 21:51:40 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          On  |   00000000:49:00.0 Off |                    0 |
+| N/A   33C    P0             53W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== JOB_STATISTICS ===
+=== current date     : Tue Jun 24 21:51:46 CEST 2025
+= Job-ID             : 2775261 on alex
+= Job-Name           : md_sim
+= Job-Command        : /home/hpc/hesp/hesp148v/HESP_SoSe_2025/Assignment_2/Molecular
+= Initial workdir    : /home/hpc/hesp/hesp148v/HESP_SoSe_2025/Assignment_2/Molecular
+= Queue/Partition    : a100
+= Slurm account      : hesp with QOS=normal
+= Features           : a100_40
+= Requested resources:  for 00:10:00
+= Elapsed runtime    : 00:00:06
+= Total RAM usage    : 0.1 GiB of assigned  GiB (%)
+= Node list          : a0602
+= Subm/Elig/Start/End: 2025-06-24T21:51:36 / 2025-06-24T21:51:36 / 2025-06-24T21:51:39 / 2025-06-24T21:51:45
+======================
+=== Quota infos ======
+    Path              Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/woody          0.0K  1000.0G  1500.0G        N/A       1    5,000K   7,500K        N/A    
+    /home/hpc            7.3G   104.9G   209.7G        N/A  36,354      500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A100-SXM4-40GB, 00000000:49:00.0, 3749386, 0 %, 0 %, 416 MiB, 1072 ms
+NVIDIA A100-SXM4-40GB, 00000000:49:00.0, 3749401, 0 %, 0 %, 416 MiB, 868 ms
+NVIDIA A100-SXM4-40GB, 00000000:49:00.0, 3749417, 0 %, 0 %, 416 MiB, 672 ms
+NVIDIA A100-SXM4-40GB, 00000000:49:00.0, 3749439, 0 %, 0 %, 416 MiB, 892 ms
+NVIDIA A100-SXM4-40GB, 00000000:49:00.0, 3749454, 3 %, 0 %, 416 MiB, 866 ms
+NVIDIA A100-SXM4-40GB, 00000000:49:00.0, 3749469, 1 %, 0 %, 416 MiB, 881 ms
+### Starting TaskPrologue of job 2775394 on a0801 at Tue Jun 24 22:40:48 CEST 2025
+Running on cores 80-95 with governor ondemand
+Tue Jun 24 22:40:48 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          On  |   00000000:96:00.0 Off |                    0 |
+| N/A   32C    P0             54W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== JOB_STATISTICS ===
+=== current date     : Tue Jun 24 22:41:00 CEST 2025
+= Job-ID             : 2775394 on alex
+= Job-Name           : md_sim
+= Job-Command        : /home/hpc/hesp/hesp148v/HESP_SoSe_2025/Assignment_2/Molecular
+= Initial workdir    : /home/hpc/hesp/hesp148v/HESP_SoSe_2025/Assignment_2/Molecular
+= Queue/Partition    : a100
+= Slurm account      : hesp with QOS=normal
+= Features           : a100_40
+= Requested resources:  for 00:10:00
+= Elapsed runtime    : 00:00:21
+= Total RAM usage    : 0.4 GiB of assigned  GiB (%)
+= Node list          : a0801
+= Subm/Elig/Start/End: 2025-06-24T22:40:37 / 2025-06-24T22:40:37 / 2025-06-24T22:40:38 / 2025-06-24T22:40:59
+======================
+=== Quota infos ======
+    Path              Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/woody          0.0K  1000.0G  1500.0G        N/A       1    5,000K   7,500K        N/A    
+    /home/hpc            7.9G   104.9G   209.7G        N/A  36,458      500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4169573, 2 %, 0 %, 416 MiB, 1094 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4169589, 0 %, 0 %, 416 MiB, 901 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4169638, 0 %, 0 %, 416 MiB, 938 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4169718, 0 %, 0 %, 416 MiB, 943 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4169737, 1 %, 0 %, 416 MiB, 1099 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4169751, 2 %, 0 %, 416 MiB, 1098 ms
+### Starting TaskPrologue of job 2775395 on a0801 at Tue Jun 24 22:41:09 CEST 2025
+Running on cores 80-95 with governor ondemand
+Tue Jun 24 22:41:09 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          On  |   00000000:96:00.0 Off |                    0 |
+| N/A   32C    P0             54W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== JOB_STATISTICS ===
+=== current date     : Tue Jun 24 22:41:14 CEST 2025
+= Job-ID             : 2775395 on alex
+= Job-Name           : md_sim
+= Job-Command        : ./run.sh
+= Initial workdir    : /home/hpc/hesp/hesp148v/HESP_SoSe_2025/Assignment_2/Molecular
+= Queue/Partition    : a100
+= Slurm account      : hesp with QOS=normal
+= Features           : a100_40
+= Requested resources:  for 00:10:00
+= Elapsed runtime    : 00:00:06
+= Total RAM usage    : 0.0 GiB of assigned  GiB (%)
+= Node list          : a0801
+= Subm/Elig/Start/End: 2025-06-24T22:41:07 / 2025-06-24T22:41:07 / 2025-06-24T22:41:08 / 2025-06-24T22:41:14
+======================
+=== Quota infos ======
+    Path              Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/woody          0.0K  1000.0G  1500.0G        N/A       1    5,000K   7,500K        N/A    
+    /home/hpc            7.9G   104.9G   209.7G        N/A  36,458      500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4170630, 0 %, 0 %, 416 MiB, 772 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4170647, 1 %, 0 %, 416 MiB, 771 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4170693, 4 %, 0 %, 416 MiB, 789 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4170770, 0 %, 0 %, 416 MiB, 805 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4170816, 0 %, 0 %, 416 MiB, 861 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 4170830, 0 %, 0 %, 416 MiB, 842 ms
+### Starting TaskPrologue of job 2775398 on a0801 at Tue Jun 24 22:55:08 CEST 2025
+Running on cores 80-95 with governor ondemand
+Tue Jun 24 22:55:08 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-40GB          On  |   00000000:96:00.0 Off |                    0 |
+| N/A   32C    P0             54W /  400W |       0MiB /  40960MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+### Finished TaskPrologue
+
+=== JOB_STATISTICS ===
+=== current date     : Tue Jun 24 22:55:16 CEST 2025
+= Job-ID             : 2775398 on alex
+= Job-Name           : md_sim
+= Job-Command        : ./run.sh
+= Initial workdir    : /home/hpc/hesp/hesp148v/HESP_SoSe_2025/Assignment_2/Molecular
+= Queue/Partition    : a100
+= Slurm account      : hesp with QOS=normal
+= Features           : a100_40
+= Requested resources:  for 00:10:00
+= Elapsed runtime    : 00:00:15
+= Total RAM usage    : 0.0 GiB of assigned  GiB (%)
+= Node list          : a0801
+= Subm/Elig/Start/End: 2025-06-24T22:55:00 / 2025-06-24T22:55:00 / 2025-06-24T22:55:01 / 2025-06-24T22:55:16
+======================
+=== Quota infos ======
+    Path              Used     SoftQ    HardQ    Gracetime  Filec    FileQ    FiHaQ    FileGrace    
+    /home/woody          0.0K  1000.0G  1500.0G        N/A       1    5,000K   7,500K        N/A    
+    /home/hpc            7.9G   104.9G   209.7G        N/A  36,466      500K   1,000K        N/A    
+======================
+=== GPU utilization ==
+gpu_name, gpu_bus_id, pid, gpu_utilization [%], mem_utilization [%], max_memory_usage [MiB], time [ms]
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 16505, 0 %, 0 %, 416 MiB, 749 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 16586, 0 %, 0 %, 416 MiB, 769 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 16604, 0 %, 0 %, 416 MiB, 816 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 16618, 1 %, 0 %, 416 MiB, 823 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 16633, 5 %, 0 %, 416 MiB, 801 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 16647, 0 %, 0 %, 416 MiB, 814 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 16696, 0 %, 0 %, 416 MiB, 896 ms
+NVIDIA A100-SXM4-40GB, 00000000:96:00.0, 16785, 0 %, 0 %, 416 MiB, 865 ms

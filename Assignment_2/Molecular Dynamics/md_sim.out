@@ -2,10 +2,12 @@
 mkdir -p build
 Test Case | #Particles | Avg. Time/Step (s)
 --------------------------------------------
-stable-particle | 2 | 3.15046e-05
-attact-particle | 2 | 2.93765e-05
-repel-particle | 2 | 2.93068e-05
-block-particles | 10 | 3.81672e-05
-grid-particles | 9 | 3.42127e-05
-particles_test1 | 2 | 3.19962e-05
+stable-particle | 10 | 0.000183658
+attact-particle | 10 | 0.000204239
+repel-particle | 10 | 0.000200953
+block-particles | 10 | 0.000192296
+grid-particles | 10 | 0.000197732
+particles_test1 | 10 | 0.000193906
+collision_cluster | 11 | 0.000252999
+repulsiveshell | 10 | 0.000233387
 Done! Check the output directory for results.
