@@ -15,7 +15,7 @@ CUDA_PATH="/opt/nvidia/hpc_sdk/Linux_x86_64/2025/cuda"
 CUDA_LIB="$CUDA_PATH/lib64"
 CUDA_INCLUDE="$CUDA_PATH/include"
 
-NVCC_FLAGS="--std=c++17 -arch=sm_89 -Xcompiler=-fPIC -I$CUDA_INCLUDE"
+NVCC_FLAGS="--std=c++17 -arch=sm_75 -Xcompiler=-fPIC -I$CUDA_INCLUDE -allow-unsupported-compiler"
 
 # === BUILD ===
 echo "[1/3] Compiling lodepng.cpp..."
@@ -38,6 +38,7 @@ configs=(
     "-0.70176 -0.3842 output/julia_dense.png"
     "0.355 0.355 output/julia_eye.png"
     "-0.75 0.11 output/julia_nebula.png"
+    "0.37 0.1 output/julia_custom.png"     
 )
 
 # Process each configuration
